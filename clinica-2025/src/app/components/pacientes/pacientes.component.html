@@ -1,0 +1,34 @@
+<div class="register-container" *ngIf="usuario && usuario.rol === 'Especialista'">
+  <div class="register-form">
+    <h3>Pacientes Atendidos</h3>
+    <div *ngIf="pacientesAtendidos.length === 0">
+      <p>No atendiste pacientes aún.</p>
+    </div>
+    <div *ngFor="let paciente of pacientesAtendidos">
+      <button class="chip" (click)="seleccionarPaciente(paciente)">
+        {{ paciente.nombre }} {{ paciente.apellido }}
+      </button>
+    </div>
+
+    <div *ngIf="pacienteSeleccionado">
+      <h4>Historia Clínica de {{ pacienteSeleccionado.nombre }} {{ pacienteSeleccionado.apellido }}</h4>
+      <div *ngIf="historiaClinica.length === 0">
+        <p>No hay atenciones registradas.</p>
+      </div>
+      <div *ngFor="let atencion of historiaClinica">
+        <div class="turno-card">
+          <b>Fecha:</b> {{ atencion.fecha_atencion | date:'short' }}<br>
+          <b>Altura:</b> {{ atencion.altura }} cm<br>
+          <b>Peso:</b> {{ atencion.peso }} kg<br>
+          <b>Temperatura:</b> {{ atencion.temperatura }} °C<br>
+          <b>Presión:</b> {{ atencion.presion }}<br>
+          <div *ngIf="atencion.datos_dinamicos">
+            <div *ngFor="let clave of objectKeys(atencion.datos_dinamicos)">
+              <b>{{ clave }}:</b> {{ atencion.datos_dinamicos[clave] }}<br>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

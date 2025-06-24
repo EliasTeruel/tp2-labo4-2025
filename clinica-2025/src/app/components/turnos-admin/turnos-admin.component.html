@@ -1,0 +1,45 @@
+<div class="register-container">
+  <div class="register-form">
+    <div class="form-group filtros">
+      <label>Especialidad:</label>
+      <span *ngFor="let esp of especialidades"
+            (click)="filtrarPorEspecialidad(esp.id)"
+            [class.selected]="esp.id === filtroEspecialidad"
+            class="chip">
+        {{ esp.nombre }}
+      </span>
+    </div>
+    <div class="form-group filtros">
+      <label>Especialista:</label>
+      <span *ngFor="let user of especialistas"
+            (click)="filtrarPorEspecialista(user.id)"
+            [class.selected]="user.id === filtroEspecialista"
+            class="chip">
+        {{ user.nombre }} {{ user.apellido }}
+      </span>
+    </div>
+
+    <div *ngFor="let turno of turnosFiltrados" class="turno-card" [appResaltarRealizado]="turno.estado">
+      <div>
+        <b>Fecha:</b> {{ turno.fecha }} {{ turno.hora }}<br>
+        <b>Especialidad:</b> {{ turno.especialidades.nombre }}<br>
+        <b>Especialista:</b> {{ turno.usuarios.nombre }} {{ turno.usuarios.apellido }}<br>
+        <b>Estado:</b> <span [class]="turno.estado">{{ turno.estado | uppercase }}</span>
+      </div>
+      <div class="acciones">
+        <button *ngIf="puedeCancelar(turno)" class="btn btn-register" (click)="abrirCancelar(turno)">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" *ngIf="modalAbierto">
+  <div class="modal-custom">
+    <h4>Cancelar turno</h4>
+    <textarea [(ngModel)]="modalComentario" rows="4" class="form-control" placeholder="Ingrese el motivo de la cancelación"></textarea>
+    <div class="modal-actions">
+      <button class="btn btn-register" (click)="confirmarCancelar()">Confirmar</button>
+      <button class="btn btn-secondary" (click)="cerrarModal()">Cerrar</button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,340 @@
+<div class="register-container">
+  <div
+    class="register-card"
+    *ngIf="!tipoSeleccionado && !bloquearSeleccionTipo"
+  >
+    <h2 class="register-title">¿Cómo deseas registrarte?</h2>
+    <div class="register-type-btns">
+      <button
+        type="button"
+        class="btn btn-register-type"
+        (click)="seleccionarTipo('Paciente')"
+      >
+        <img
+          src="/paciente.png"
+          alt="Paciente"
+          class="register-type-img-only"
+        />
+      </button>
+      <button
+        type="button"
+        class="btn btn-register-type"
+        (click)="seleccionarTipo('Especialista')"
+      >
+        <img
+          src="/especialista.png"
+          alt="Especialista"
+          class="register-type-img-only"
+        />
+      </button>
+    </div>
+  </div>
+
+  <form *ngIf="tipoSeleccionado" class="register-form" (ngSubmit)="register()">
+    <div class="form-group">
+      <input
+        [(ngModel)]="firstName"
+        name="firstName"
+        class="form-control my-2"
+        placeholder="Nombre"
+        required
+        pattern="^[a-zA-Z\s]+$"
+      />
+      <div *ngIf="firstNameError" class="invalid-feedback">
+        {{ firstNameError }}
+      </div>
+
+      <input
+        [(ngModel)]="lastName"
+        name="lastName"
+        class="form-control my-2"
+        placeholder="Apellido"
+        required
+        pattern="^[a-zA-Z\s]+$"
+      />
+      <div *ngIf="lastNameError" class="invalid-feedback">
+        {{ lastNameError }}
+      </div>
+
+      <select
+        [(ngModel)]="userType"
+        name="userType"
+        (change)="onUserTypeChange($event)"
+        class="form-control my-2"
+        required
+      >
+        <option value="" disabled selected>Seleccionar...</option>
+        <option value="Paciente">Paciente</option>
+        <option value="Especialista">Especialista</option>
+        <option *ngIf="selectedRol === 'admin'" value="admin">
+          Administrador
+        </option>
+      </select>
+
+      <select
+        *ngIf="isPaciente"
+        [(ngModel)]="obraSocial"
+        name="obraSocial"
+        class="form-control my-2"
+        required
+      >
+        <option value="" disabled selected>Seleccionar Obra Social...</option>
+        <option *ngFor="let os of obrasSociales" [value]="os.nombre">
+          {{ os.nombre }}
+        </option>
+        <option value="otra">Otra</option>
+      </select>
+      <input
+        *ngIf="obraSocial === 'otra'"
+        type="text"
+        [(ngModel)]="nuevaObraSocial"
+        name="nuevaObraSocial"
+        class="form-control my-2"
+        placeholder="Especifique nueva obra social..."
+      />
+
+      <div *ngIf="isEspecialista" class="form-group">
+        <div *ngFor="let esp of especialidades">
+          <input
+            type="checkbox"
+            [value]="esp.nombre"
+            (change)="onCheckboxChange($event)"
+            [checked]="especialidadesSeleccionadas.includes(esp.nombre)"
+          />
+          {{ esp.nombre }}
+        </div>
+        <button
+          type="button"
+          class="btn btn-link p-0"
+          (click)="mostrarCampoNuevaEspecialidad = true"
+          *ngIf="!mostrarCampoNuevaEspecialidad"
+        >
+          + Agregar especialidad
+        </button>
+
+        <div *ngIf="mostrarCampoNuevaEspecialidad" class="mt-2">
+          <input
+            id="nuevaEspecialidad"
+            type="text"
+            [(ngModel)]="nuevaEspecialidad"
+            name="nuevaEspecialidad"
+            class="form-control my-2"
+            placeholder="Nueva especialidad"
+          />
+          <button
+            type="button"
+            class="btn btn-primary btn-sm"
+            (click)="agregarEspecialidad()"
+          >
+            Guardar especialidad
+          </button>
+          <button
+            type="button"
+            class="btn btn-secondary btn-sm ms-2"
+            (click)="cancelarAgregarEspecialidad()"
+          >
+            Cancelar
+          </button>
+          <div *ngIf="flagError" class="text-danger">{{ msjError }}</div>
+        </div>
+      </div>
+
+      <input
+        type="number"
+        [(ngModel)]="age"
+        name="age"
+        class="form-control my-2"
+        placeholder="Edad"
+        required
+        [min]="isEspecialista ? 18 : 1"
+        [max]="isEspecialista ? 75 : 99"
+      />
+      <div *ngIf="ageError" class="invalid-feedback">
+        {{ ageError }}
+      </div>
+
+      <input
+        [(ngModel)]="dni"
+        name="dni"
+        class="form-control my-2"
+        placeholder="DNI"
+        required
+        pattern="^\d{7,10}$"
+      />
+      <div *ngIf="dniError" class="invalid-feedback">
+        {{ dniError }}
+      </div>
+
+      <input
+        type="email"
+        [(ngModel)]="email"
+        name="email"
+        class="form-control my-2"
+        placeholder="Correo electrónico"
+        required
+      />
+      <div *ngIf="emailError" class="invalid-feedback">
+        {{ emailError }}
+      </div>
+
+      <input
+        type="password"
+        [(ngModel)]="password"
+        name="password"
+        class="form-control my-2"
+        placeholder="Contraseña"
+        required
+        minlength="6"
+      />
+      <div *ngIf="passwordError" class="invalid-feedback">
+        {{ passwordError }}
+      </div>
+
+      <div class="form-group">
+        <input
+          type="file"
+          accept="image/*"
+          (change)="onFileSelected($event, 'perfil')"
+          class="form-control my-2"
+          required
+        />
+        <div *ngIf="fileError" class="invalid-feedback">
+          {{ fileError }}
+        </div>
+        <input
+          *ngIf="isPaciente"
+          type="file"
+          accept="image/*"
+          (change)="onFileSelected($event, 'carnet')"
+          class="form-control my-2"
+          required
+          placeholder="Imagen de carnet/obra social"
+        />
+        <div *ngIf="carnetFileError" class="invalid-feedback">
+          {{ carnetFileError }}
+        </div>
+      </div>
+
+      <div *ngIf="msjError" class="alert alert-danger mt-3">
+        {{ msjError }}
+      </div>
+
+      <div class="d-grid gap-2">
+<button
+  *ngIf="!captchaDeshabilitado"
+  type="button"
+  class="btn btn-register"
+  [disabled]="isLoading"
+  appCaptcha
+  (captchaVerified)="onCaptchaVerified($event)"
+>
+  Registrarse
+  <span *ngIf="isLoading" class="spinner"></span>
+</button>
+
+<button
+  *ngIf="captchaDeshabilitado"
+  type="submit"
+  class="btn btn-register"
+  [disabled]="isLoading"
+>
+  Registrarse
+  <span *ngIf="isLoading" class="spinner"></span>
+</button>
+
+<div class="form-check form-switch mb-3">
+  <input
+    class="form-check-input"
+    type="checkbox"
+    id="captchaToggle"
+    [(ngModel)]="captchaDeshabilitado"
+    name="captchaToggle"
+  />
+  <label class="form-check-label" for="captchaToggle">
+    Desactivar verificación CAPTCHA
+  </label>
+</div>
+
+
+        <div class="login-link-container">
+          <p>
+            ¿Ya tienes una cuenta?
+            <a routerLink="../login" class="btn btn-link p-0">Inicia sesión</a>
+          </p>
+        </div>
+        <div *ngIf="isLoading" class="text-center mt-3">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Cargando...</span>
+          </div>
+        </div>
+        <div *ngIf="flagError" class="text-center text-danger">
+          {{ msjError }}
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <div *ngIf="showVerifyEmailModal" class="modal-overlay">
+    <div class="modal">
+      <span class="close" (click)="closeVerifyEmailModal()">&times;</span>
+      <h2 class="text-primary text-center mb-4">¡Verifica tu correo!</h2>
+      <p class="text-center">
+        Se ha enviado un correo de verificación a <b>{{ userEmail }}</b
+        >.<br />
+        Por favor, revisa tu bandeja de entrada y haz clic en el enlace para
+        activar tu cuenta.<br />
+        <br />
+        <b
+          >Una vez validado, haz clic en el botón para finalizar tu registro.</b
+        >
+      </p>
+      <div class="d-flex justify-content-around mt-4">
+        <button (click)="onValidateEmail()" class="btn btn-register">
+          Ya validé mi correo
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Modal de captcha -->
+<!-- <div *ngIf="showCaptcha" class="modal-overlay">
+    <div class="modal">
+      <span class="close" (click)="closeCaptchaModal()">&times;</span>
+      <h1 class="text-center text-primary">Verificación</h1>
+      <div class="captcha-container">
+        <label
+          >Arrastra el círculo al cuadro para verificar que no eres un
+          robot:</label
+        >
+        <div
+          class="drag-object"
+          draggable="true"
+          (dragstart)="onDragStart($event)"
+          (dragend)="onDragEnd($event)"
+        >
+          🔵
+        </div>
+        <div
+          class="drop-zone"
+          (drop)="onDrop($event)"
+          (dragover)="onDragOver($event)"
+          (dragleave)="onDragLeave($event)"
+        >
+          Suelta aquí
+        </div>
+        <span>{{ captchaMessage }}</span>
+      </div>
+    </div>
+  </div> -->

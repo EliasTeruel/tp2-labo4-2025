@@ -1,0 +1,85 @@
+<div class="register-container">
+  <form class="register-form" (ngSubmit)="onSubmit()" *ngIf="especialidades">
+    <div class="form-group">
+      <label>Especialidad</label>
+      <select [(ngModel)]="especialidadSeleccionada" name="especialidad" class="form-control my-2" required (change)="onEspecialidadChange()">
+        <option value="" disabled selected>Seleccionar...</option>
+        <option *ngFor="let esp of especialidades" [value]="esp.id">{{ esp.nombre }}</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <div *ngIf="loadingEspecialistas" class="loading-container">
+        <span class="loading-spinner"></span> Cargando especialistas...
+        <label>Especialista</label>
+      </div>
+      
+      <select *ngIf="!loadingEspecialistas && especialistas.length > 0" 
+              [(ngModel)]="especialistaSeleccionado" 
+              name="especialista" 
+              class="form-control my-2" 
+              required 
+              (change)="onEspecialistaChange()">
+        <option value="" disabled selected>Seleccionar...</option>
+        <option *ngFor="let esp of especialistas" [value]="esp.id">{{ esp.nombre }} {{ esp.apellido }}</option>
+      </select>
+      
+      <div *ngIf="!loadingEspecialistas && especialistas.length === 0 && especialidadSeleccionada" class="alert alert-warning">
+        {{ msjNoEspecialistas || 'No hay especialistas disponibles' }}
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Día</label>
+      <div *ngIf="loadingFechas" class="loading-container">
+        <span class="loading-spinner"></span> Cargando fechas disponibles...
+      </div>
+      
+      <select *ngIf="!loadingFechas && fechasDisponibles.length > 0" 
+              [(ngModel)]="fechaSeleccionada" 
+              name="fecha" 
+              class="form-control my-2" 
+              required 
+              (change)="onFechaChange()">
+        <option value="" disabled selected>Seleccionar...</option>
+        <option *ngFor="let fecha of fechasDisponibles" [value]="fecha">
+          {{ fecha | date:'fullDate':'':'es-AR' }}
+        </option>
+      </select>
+      
+      <div *ngIf="!loadingFechas && fechasDisponibles.length === 0 && especialistaSeleccionado" class="alert alert-warning">
+        {{ msjNoFechas || 'No hay fechas disponibles' }}
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Horario</label>
+      <div *ngIf="loadingHorarios" class="loading-container">
+        <span class="loading-spinner"></span> Cargando horarios disponibles...
+      </div>
+      
+      <select *ngIf="!loadingHorarios && horariosDisponibles.length > 0" 
+              [(ngModel)]="horaSeleccionada" 
+              name="hora" 
+              class="form-control my-2" 
+              required>
+        <option value="" disabled selected>Seleccionar...</option>
+        <option *ngFor="let hora of horariosDisponibles" [value]="hora">{{ hora }}</option>
+      </select>
+      
+      <div *ngIf="!loadingHorarios && horariosDisponibles.length === 0 && fechaSeleccionada" class="alert alert-warning">
+        {{ msjSinHorarios || 'No hay horarios disponibles' }}
+      </div>
+    </div>
+
+    <div class="d-grid gap-2">
+      <button type="submit" class="btn btn-register" [disabled]="isLoading || !horaSeleccionada">
+        <span *ngIf="isLoading" class="loading-spinner"></span>
+        {{ isLoading ? 'Procesando...' : 'Solicitar Turno' }}
+      </button>
+    </div>
+    
+    <div *ngIf="msjError" class="alert alert-danger">{{ msjError }}</div>
+    <div *ngIf="msjExito" class="alert alert-success">{{ msjExito }}</div>
+  </form>
+</div>

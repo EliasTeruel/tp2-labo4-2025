@@ -1,0 +1,87 @@
+<div class="register-container" *ngIf="usuario">
+  <div class="register-form">
+    <div class="perfil-header">
+      <img [src]="usuario.url_imagen" alt="Avatar" class="perfil-avatar" *ngIf="usuario.url_imagen">
+      <div class="perfil-info">
+      <h2>{{ usuario.nombre }} {{ usuario.apellido }}</h2>
+      <p><b>Email:</b> {{ usuario.email }}</p>
+      <p><b>DNI:</b> {{ usuario.dni }}</p>
+      <p><b>Edad:</b> {{ usuario.edad }}</p>
+      <p><b>Rol:</b> {{ usuario.rol }}</p>
+      <div *ngIf="usuario.rol === 'Especialista'">
+        <b>Especialidades:</b>
+        <span *ngFor="let esp of especialidades"
+              class="chip"
+              [class.selected]="esp.id === especialidadSeleccionada?.id"
+              (click)="seleccionarEspecialidad(esp)">
+          {{ esp.nombre }}
+        </span>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="register-container" *ngIf="usuario && usuario.rol === 'Especialista' && especialidadSeleccionada">
+  <div class="register-form">
+    <h3>Mis Horarios - {{ especialidadSeleccionada.nombre }}</h3>
+    <div class="turno-card">
+      <div class="horarios-header filtros horarios-dia" style="font-weight: bold; border-bottom: 1px solid #ccc; margin-bottom: 10px;">
+        <div style="min-width: 120px;">Día</div>
+        <div style="min-width: 110px;">Desde</div>
+        <div style="min-width: 110px;">Hasta</div>
+        <div style="min-width: 90px;">Acción</div>
+      </div>
+      <div *ngFor="let dia of dias.slice(1); let i = index" class="filtros horarios-dia">
+        <div style="min-width: 120px;">
+          <label>
+            <input type="checkbox"
+                   [(ngModel)]="horariosPorDia[i+1].activo">
+            {{ dia }}
+          </label>
+        </div>
+        <div style="min-width: 110px;">
+          <select [(ngModel)]="horariosPorDia[i+1].inicio" [disabled]="!horariosPorDia[i+1].activo" class="form-control">
+            <option value="">Desde</option>
+            <option *ngFor="let h of getHorariosParaDia(i+1)" [value]="h">{{ h }}</option>
+          </select>
+        </div>
+        <div style="min-width: 110px;">
+          <select [(ngModel)]="horariosPorDia[i+1].fin" [disabled]="!horariosPorDia[i+1].activo" class="form-control">
+            <option value="">Hasta</option>
+            <option *ngFor="let h of getHorariosParaDia(i+1)" [value]="h">{{ h }}</option>
+          </select>
+        </div>
+        <div style="min-width: 90px;">
+          <button class="btn btn-register"
+                  [disabled]="!horariosPorDia[i+1].activo || !horariosPorDia[i+1].inicio || !horariosPorDia[i+1].fin"
+                  (click)="guardarDia(i+1)">
+            Guardar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="register-container" *ngIf="usuario && usuario.rol === 'Paciente'">
+  <div class="register-form">
+    <h3>Historia Clínica</h3>
+    <div *ngIf="historiaClinica.length === 0">
+      <p>No hay atenciones registradas.</p>
+    </div>
+    <div *ngFor="let atencion of historiaClinica" >
+      <div  class="turno-card">
+        <b>Fecha:</b> {{ atencion.fecha_atencion | date:'short' }}<br>
+        <b>Altura:</b> {{ atencion.altura }} cm<br>
+        <b>Peso:</b> {{ atencion.peso }} kg<br>
+        <b>Temperatura:</b> {{ atencion.temperatura }} °C<br>
+        <b>Presión:</b> {{ atencion.presion }}<br>
+        <div *ngIf="atencion.datos_dinamicos">
+          <div *ngFor="let clave of objectKeys(atencion.datos_dinamicos)">
+            <b>{{ clave }}:</b> {{ atencion.datos_dinamicos[clave] }}<br>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

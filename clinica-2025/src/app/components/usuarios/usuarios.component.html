@@ -1,0 +1,79 @@
+<div class="register-container">
+  <div class="register-form">
+    <h3>Usuarios - Historia Clínica</h3>
+
+    <div>
+      <label><b>Filtrar por especialista:</b></label>
+      <span
+        class="chip"
+        [class.selected]="!especialistaSeleccionado"
+        (click)="verTodosLosPacientes()"
+      >
+        Todos
+      </span>
+      <span
+        *ngFor="let esp of especialistas"
+        class="chip"
+        [class.selected]="especialistaSeleccionado?.id === esp.id"
+        (click)="seleccionarEspecialista(esp)"
+      >
+        {{ esp.nombre }} {{ esp.apellido }}
+      </span>
+    </div>
+
+    <div style="margin-top: 15px">
+      <label><b>Pacientes:</b></label>
+      <span
+        *ngFor="let paciente of pacientes"
+        class="chip"
+        [class.selected]="pacienteSeleccionado?.id === paciente.id"
+        (click)="seleccionarPaciente(paciente)"
+      >
+        {{ paciente.nombre }} {{ paciente.apellido }}
+      </span>
+    </div>
+
+    <div *ngIf="pacienteSeleccionado">
+      <h4>
+        Historia Clínica de {{ pacienteSeleccionado.nombre }}
+        {{ pacienteSeleccionado.apellido }}
+      </h4>
+      <div *ngIf="historiaClinica.length === 0" appResaltarHistoria="vacia">
+        <p>No hay atenciones registradas.</p>
+      </div>
+      <div *ngFor="let atencion of historiaClinica">
+        <div class="turno-card" [appResaltarHistoria]="'completa'">
+          <b>Fecha:</b> {{ atencion.fecha_atencion | date : "short" }}<br />
+          <b>Altura:</b> {{ atencion.altura }} cm<br />
+          <b>Peso:</b> {{ atencion.peso }} kg<br />
+          <b>Temperatura:</b> {{ atencion.temperatura }} °C<br />
+          <b>Presión:</b> {{ atencion.presion }}<br />
+          <div *ngIf="atencion.datos_dinamicos">
+            <div *ngFor="let clave of objectKeys(atencion.datos_dinamicos)">
+              <b>{{ clave }}:</b> {{ atencion.datos_dinamicos[clave] }}<br />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="!pacienteSeleccionado && historiaClinica.length > 0">
+      <h4>Historias Clínicas de todos los pacientes</h4>
+      <div *ngFor="let atencion of historiaClinica">
+        <div class="turno-card" [appResaltarHistoria]="'completa'">
+          <b>Paciente:</b> {{ getNombrePaciente(atencion.paciente_id) }}<br />
+          
+          <b>Fecha:</b> {{ atencion.fecha_atencion | date : "short" }}<br />
+          <b>Altura:</b> {{ atencion.altura }} cm<br />
+          <b>Peso:</b> {{ atencion.peso }} kg<br />
+          <b>Temperatura:</b> {{ atencion.temperatura }} °C<br />
+          <b>Presión:</b> {{ atencion.presion }}<br />
+          <div *ngIf="atencion.datos_dinamicos">
+            <div *ngFor="let clave of objectKeys(atencion.datos_dinamicos)">
+              <b>{{ clave }}:</b> {{ atencion.datos_dinamicos[clave] }}<br />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

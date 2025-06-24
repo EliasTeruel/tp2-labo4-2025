@@ -1,0 +1,140 @@
+<div class="admin-panel-container">
+  <h2 class="admin-title">Gestión de Especialistas</h2>
+  <div *ngIf="errorMsg" class="alert alert-danger">{{ errorMsg }}</div>
+  <div *ngIf="isLoading" class="text-center my-4">
+    <div class="spinner-border text-primary" role="status"></div>
+  </div>
+  <button class="btn btn-register" (click)="registrarUsuario('admin')">
+    Registrar Administrador
+  </button>
+  <button class="btn btn-register" (click)="descargarExcelUsuarios()">
+    Descargar Excel de Usuarios
+  </button>
+
+<div style="margin: 24px 0 16px 0; display: flex; align-items: center; gap: 12px;">
+  <label for="informeSelect" style="font-weight: bold; margin-right: 8px;">Ver informe:</label>
+  <select
+    id="informeSelect"
+    [(ngModel)]="informeSeleccionado"
+    class="form-select"
+    style="width: 260px; border-radius: 6px; border: 1px solid #28a745; padding: 6px 12px; font-size: 1rem;"
+  >
+    <option value="seleccionar" disabled>Seleccionar</option>
+    <option value="especialidad">Turnos por especialidad</option>
+    <option value="log">Log de ingresos</option>
+    <option value="dia">Turnos por día</option>
+    <option value="medico">Turnos por médico</option>
+  </select>
+  <button
+  *ngIf="informeSeleccionado !== 'seleccionar' && mostrarInformes"
+  type="button"
+  class="btn btn-register"
+  style="margin-left: 8px;"
+  (click)="ocultarInformes()"
+>
+  Ocultar informes
+</button>
+</div>
+<div *ngIf="mostrarInformes && informeSeleccionado !== 'seleccionar'">
+<div *ngIf="mostrarInformes">
+  <div *ngIf="informeSeleccionado === 'especialidad'" class="grafico-turnos-especialidad">
+    <h4>Turnos por especialidad</h4>
+    <canvas baseChart [data]="barChartData" [type]="barChartType"> </canvas>
+    <button  class="btn btn-register" (click)="exportarTurnosEspecialidadExcel()">Descargar Excel</button>
+    <button  class="btn btn-register" (click)="exportarTurnosEspecialidadPDF()">Descargar PDF</button>
+  </div>
+  <div *ngIf="informeSeleccionado === 'log'" class="grafico-log-ingresos">
+    <h4>Log de ingresos al sistema</h4>
+    <table class="table table-sm">
+      <thead>
+        <tr>
+          <th>Usuario</th>
+          <th>Fecha y Hora</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let log of logIngresos">
+          <td>{{ log.usuario_email }}</td>
+          <td>{{ log.fecha_hora | date : "short" }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <button  class="btn btn-register" (click)="exportarLogIngresosExcel()">Descargar Excel</button>
+    <button  class="btn btn-register" (click)="exportarLogIngresosPDF()">Descargar PDF</button>
+  </div>
+  <div *ngIf="informeSeleccionado === 'dia'" class="grafico-turnos-dia">
+    <h4>Turnos por día</h4>
+    <canvas baseChart [data]="lineChartData" chartType="line"> </canvas>
+    <button  class="btn btn-register" (click)="exportarTurnosPorDiaExcel()">Descargar Excel</button>
+    <button  class="btn btn-register" (click)="exportarTurnosPorDiaPDF()">Descargar PDF</button>
+  </div>
+
+  <div *ngIf="informeSeleccionado === 'medico'" class="grafico-turnos-medico">
+    <h4>Turnos por médico</h4>
+    <input type="date" [(ngModel)]="fechaDesde" />
+    <input type="date" [(ngModel)]="fechaHasta" />
+    <button  class="btn btn-register" (click)="cargarTurnosPorMedico('pendiente')">Solicitados</button>
+    <button  class="btn btn-register" (click)="cargarTurnosPorMedico('realizado')">Finalizados</button>
+    <canvas baseChart [data]="barMedicoChartData" chartType="bar"> </canvas>
+    <button class="btn btn-register"  (click)="exportarTurnosPorMedicoExcel()">Descargar Excel</button>
+    <button  class="btn btn-register" (click)="exportarTurnosPorMedicoPDF()">Descargar PDF</button>
+  </div>
+</div>
+</div>
+
+  <!-- <button class="btn btn-register" (click)="registrarUsuario('especialista')">
+  Registrar Especialista
+</button>
+<button class="btn btn-register" (click)="registrarUsuario('paciente')">
+  Registrar Paciente
+</button> -->
+  <table class="especialistas-table" *ngIf="!isLoading">
+    <thead>
+      <tr>
+        <th>Foto</th>
+        <th>Nombre</th>
+        <th>Apellido</th>
+        <th>Estado</th>
+        <th>Acción</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr
+        *ngFor="let esp of especialistas"
+        [appResaltarDeshabilitado]="!esp.validado"
+      >
+        <td>
+          <img [src]="esp.url_imagen" alt="foto" class="especialista-img" />
+        </td>
+        <td>{{ esp.nombre }}</td>
+        <td>{{ esp.apellido }}</td>
+        <td>
+          <span
+            [class.text-success]="esp.verificado"
+            [class.text-danger]="!esp.validado"
+          >
+            {{ esp.validado ? "Habilitado" : "Deshabilitado" }}
+          </span>
+        </td>
+        <td>
+          <!-- <pre style="font-size:10px;">{{ esp.verificado | json }}</pre> -->
+          <button
+            class="btn btn-register"
+            (click)="toggleValidado(esp)"
+            [disabled]="!esp.verificado"
+            [style.background]="!esp.verificado ? '#ccc' : '#28a745'"
+          >
+            {{ esp.validado ? "Deshabilitar" : "Habilitar" }}
+          </button>
+          <div
+            *ngIf="!esp.verificado"
+            class="text-warning"
+            style="font-size: 0.85rem"
+          >
+            Pendiente de verificación de correo
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

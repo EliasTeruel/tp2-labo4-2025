@@ -1,0 +1,148 @@
+<div class="register-container">
+  <div class="register-form">
+<div class="form-group search-bar">
+  <input
+    type="text"
+    [(ngModel)]="busquedaGlobal"
+    (input)="filtrarTurnos()"
+    placeholder="🔍 Buscar por cualquier campo del turno o historia clínica..."
+    class="form-control search-input"
+    autocomplete="off"
+  />
+  <button *ngIf="busquedaGlobal" class="btn btn-secondary btn-sm" (click)="busquedaGlobal=''; filtrarTurnos()" style="margin-left:8px;">
+    Limpiar
+  </button>
+  <!-- <div class="search-help">
+    <small>
+      Ejemplos: <b>diabetes</b>, <b>140</b>, <b>alta</b>, <b>Juan</b>, <b>2024-06-22</b>, <b>presión</b>
+    </small>
+  </div> -->
+</div>
+    <div class="form-group filtros">
+      <label>Especialidad:</label>
+      <span *ngFor="let esp of especialidades" 
+            (click)="filtrarPorEspecialidad(esp.id)"
+            [class.selected]="esp.id === filtroEspecialidad"
+            class="chip">
+        {{ esp.nombre }}
+      </span>
+    </div>
+
+    <div class="form-group filtros">
+      <label *ngIf="rol === 'Paciente'">Especialista:</label>
+      <label *ngIf="rol === 'Especialista'">Paciente:</label>
+      <span *ngFor="let user of filtroUsuarios"
+            (click)="filtrarPorUsuario(user.id)"
+            [class.selected]="user.id === filtroUsuario"
+            class="chip">
+        {{ user.nombre }} {{ user.apellido }}
+      </span>
+    </div>
+
+    <!-- <div *ngFor="let turno of turnosFiltrados" class="turno-card"> -->
+      <div *ngFor="let turno of turnosFiltrados" class="turno-card" [appResaltarRealizado]="turno.estado">
+      <div>
+        <b>Fecha: </b> {{ turno.fecha }} {{ turno.hora }}<br>
+        <!-- <b>Especialidad:</b> {{ turno.especialidades.nombre }}<br> -->
+         <b>Especialidad: </b> <span [innerHTML]="turno.especialidades.nombre | resaltar:busquedaGlobal"></span><br>
+        <b *ngIf="rol === 'Paciente'">Especialista: </b>
+        <b *ngIf="rol === 'Especialista'">Paciente: </b>
+            <!-- {{ mostrarNombre(turno) }}<br> -->
+              <span>{{ turno.usuarios | nombreCompleto }}</span><br>
+        <!-- <b>Estado:</b> <span [class]="turno.estado">{{ turno.estado | uppercase }}</span> -->
+      <b>Estado: </b> <span [innerHTML]="turno.estado | estadoTurno"></span>
+      </div>
+
+      <div *ngIf="turno.historia_clinica">
+    <hr>
+    <b>Historia Clínica: </b><br>
+    <b>Altura: </b> {{ turno.historia_clinica.altura }} cm<br>
+    <b>Peso: </b> {{ turno.historia_clinica.peso }} kg<br>
+    <b>Temperatura: </b> {{ turno.historia_clinica.temperatura }} °C<br>
+    <b>Presión: </b> {{ turno.historia_clinica.presion }}<br>
+    <div *ngIf="turno.historia_clinica.datos_dinamicos">
+      <div *ngFor="let clave of objectKeys(turno.historia_clinica.datos_dinamicos)">
+        <b>{{ clave }}:</b> {{ turno.historia_clinica.datos_dinamicos[clave] }}<br>
+      </div>
+    </div>
+
+
+
+  </div>
+
+      <div class="acciones">
+        <button *ngIf="puedeCancelar(turno)" class="btn btn-register" (click)="abrirCancelar(turno)">Cancelar</button>
+        <button *ngIf="puedeRechazar(turno)" class="btn btn-register" (click)="abrirRechazar(turno)">Rechazar</button>
+        <button *ngIf="puedeAceptar(turno)" class="btn btn-register" (click)="aceptarTurno(turno)">Aceptar</button>
+        <button *ngIf="puedeFinalizar(turno)" class="btn btn-register" (click)="abrirFinalizar(turno)">Finalizar</button>
+        <button *ngIf="puedeCompletarEncuesta(turno)" class="btn btn-register" (click)="abrirEncuesta(turno)">Completar Encuesta</button>
+        <button *ngIf="puedeCalificar(turno)" class="btn btn-register" (click)="abrirCalificar(turno)">Calificar Atención</button>
+        <button *ngIf="turno?.resena" class="btn btn-secondary" (click)="verResena(turno)">Ver Reseña</button>
+        <!-- <pre>{{ turno | json }}</pre> -->
+      </div>
+    </div>
+
+<div class="modal-backdrop" *ngIf="modalAbierto">
+  <div class="modal-custom">
+    <h4>{{ modalTitulo }}</h4>
+    <div *ngIf="mensajeErrorHistoria" class="alert alert-danger" style="margin-bottom: 12px;">
+  {{ mensajeErrorHistoria }}
+</div>
+<!-- <form *ngIf="rol === 'Especialista'" (ngSubmit)="guardarHistoriaClinica()"> -->
+<form *ngIf="rol === 'Especialista'" >
+  <input type="number" [(ngModel)]="historia.altura" name="altura" placeholder="Altura (cm)" required>
+  <input type="number" [(ngModel)]="historia.peso" name="peso" placeholder="Peso (kg)" required>
+  <input type="number" [(ngModel)]="historia.temperatura" name="temperatura" placeholder="Temperatura (°C)" required>
+  <input type="text" [(ngModel)]="historia.presion" name="presion" placeholder="Presión" required>
+  <div *ngFor="let campo of camposDinamicos; let i = index">
+    <input type="text" [(ngModel)]="campo.clave" [name]="'clave'+i" placeholder="Clave dinámica">
+    <input type="text" [(ngModel)]="campo.valor" [name]="'valor'+i" placeholder="Valor dinámica">
+  </div>
+  
+<label>Rango (0-100):</label>
+<input type="range" min="0" max="100" [(ngModel)]="datosDinamicosForm.rango" name="rango" required>
+<span>{{ datosDinamicosForm.rango }}</span>
+<br>
+
+<label>Valor numérico:</label>
+<input type="number" [(ngModel)]="datosDinamicosForm.numero" name="numero" required>
+<br>
+
+<label>¿Apto físico?</label>
+<label class="switch">
+  <input type="checkbox" [(ngModel)]="datosDinamicosForm.apto" name="apto">
+  <span class="slider"></span>
+</label>
+<span>{{ datosDinamicosForm.apto ? 'Sí' : 'No' }}</span>
+<br>
+
+  <button class="btn btn-register"  type="button" (click)="agregarCampoDinamico()" [disabled]="camposDinamicos.length >= 3">Agregar campo dinámico</button>
+  <!-- <button type="submit">Guardar Historia Clínica</button> -->
+</form>
+    <textarea [(ngModel)]="modalComentario" rows="4" class="form-control" placeholder="Ingrese su comentario aquí"></textarea>
+    <div *ngIf="modalTipo === 'calificar'" class="mt-2">
+      <label>Calificación (1 a 5):</label>
+      <input type="number" min="1" max="5" [(ngModel)]="modalCalificacion" class="form-control" />
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-register" (click)="confirmarModal()" [disabled]="confirmando">
+  {{ confirmando ? 'Guardando...' : 'Confirmar' }}
+</button>
+      <button class="btn btn-secondary" (click)="cerrarModal()">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" *ngIf="modalVerResena">
+  <div class="modal-custom">
+    <h4>Reseña</h4>
+    <p>{{ modalResena }}</p>
+    <div class="modal-actions">
+      <button class="btn btn-register" (click)="cerrarModal()">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+
+  </div>
+</div>
