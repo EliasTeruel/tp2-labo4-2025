@@ -1,21 +1,31 @@
-<div class="register-container" *ngIf="usuario && usuario.rol === 'Especialista'">
+<div class="register-container" *ngIf="usuario && usuario.rol === 'Especialista'" @fadeSlideIn>
   <div class="register-form">
     <h3>Pacientes Atendidos</h3>
     <div *ngIf="pacientesAtendidos.length === 0">
       <p>No atendiste pacientes aún.</p>
     </div>
-    <div *ngFor="let paciente of pacientesAtendidos">
+
+<div *ngFor="let paciente of pacientesAtendidos" @listStagger>
+  <div class="chip-card" (click)="seleccionarPaciente(paciente)" appResaltarPacientes>
+    <h4>{{ paciente.nombre }} {{ paciente.apellido }}</h4>
+    <p>Últimos turnos: {{ paciente.ultimosTurnos | ultimosTurnos }}</p>
+  </div>
+</div>
+
+
+
+    <!-- <div *ngFor="let paciente of pacientesAtendidos">
       <button class="chip" (click)="seleccionarPaciente(paciente)">
         {{ paciente.nombre }} {{ paciente.apellido }}
       </button>
-    </div>
+    </div> -->
 
-    <div *ngIf="pacienteSeleccionado">
+    <div *ngIf="pacienteSeleccionado" @listStagger>
       <h4>Historia Clínica de {{ pacienteSeleccionado.nombre }} {{ pacienteSeleccionado.apellido }}</h4>
       <div *ngIf="historiaClinica.length === 0">
         <p>No hay atenciones registradas.</p>
       </div>
-      <div *ngFor="let atencion of historiaClinica">
+      <div *ngFor="let atencion of historiaClinica" @listStagger>
         <div class="turno-card">
           <b>Fecha:</b> {{ atencion.fecha_atencion | date:'short' }}<br>
           <b>Altura:</b> {{ atencion.altura }} cm<br>

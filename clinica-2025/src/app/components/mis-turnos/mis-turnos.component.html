@@ -1,4 +1,4 @@
-<div class="register-container">
+<div class="register-container" @zoomList>
   <div class="register-form">
 <div class="form-group search-bar">
   <input
@@ -40,7 +40,7 @@
     </div>
 
     <!-- <div *ngFor="let turno of turnosFiltrados" class="turno-card"> -->
-      <div *ngFor="let turno of turnosFiltrados" class="turno-card" [appResaltarRealizado]="turno.estado">
+      <div *ngFor="let turno of turnosFiltrados" class="turno-card" [appResaltarRealizado]="turno.estado" [@zoomIn]>
       <div>
         <b>Fecha: </b> {{ turno.fecha }} {{ turno.hora }}<br>
         <!-- <b>Especialidad:</b> {{ turno.especialidades.nombre }}<br> -->

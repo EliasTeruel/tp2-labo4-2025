@@ -8,6 +8,8 @@ import { environment } from '../../../environments/environment';
 import { createClient, User } from '@supabase/supabase-js';
 import { ActivatedRoute } from '@angular/router';
 import { CaptchaDirective } from '../../directives/captcha.directive';
+import {  trigger,  transition,  style,  animate,  query,  group} from '@angular/animations';
+
 const supabase = createClient(environment.apiUrl, environment.publicAnonKey);
 
 @Component({
@@ -16,6 +18,20 @@ const supabase = createClient(environment.apiUrl, environment.publicAnonKey);
   imports: [CommonModule, FormsModule, CaptchaDirective],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss'],
+  animations: [
+    trigger('fadeSlide', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateX(80px)' }),
+        animate('800ms ease-out', style({ opacity: 1, transform: 'translateX(0)' }))
+      ])
+    ]),
+    trigger('fadeSlideForm', [
+  transition(':enter', [
+    style({ opacity: 0, transform: 'translateY(-80px)' }),
+    animate('600ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
+  ])
+])
+  ]
 })
 export class RegisterComponent implements OnInit {
   firstName = '';

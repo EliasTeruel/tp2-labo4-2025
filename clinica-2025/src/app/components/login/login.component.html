@@ -1,15 +1,15 @@
-<div class="login-container">
+<div class="login-container" >
 
   <div class="quick-users-list">
     <div *ngFor="let user of quickUsers" class="quick-user" (click)="quickLoginUser(user)">
       <img [src]="user.url_imagen" [alt]="user.email" class="quick-user-img" />
       <div class="quick-user-role">{{ user.rol }}</div>
-      <div class="quick-user-email">{{ user.email }}</div>
+      <div class="quick-user-email">{{ user.nombre }}</div>
     </div>
   </div>
 
 
-  <div class="login-card">
+  <div class="login-card" [@slideInFromBottom]>
     <h1 class="login-title">Ingresar Usuario</h1>
 
     <form [formGroup]="loginForm" (ngSubmit)="login()" class="login-form">

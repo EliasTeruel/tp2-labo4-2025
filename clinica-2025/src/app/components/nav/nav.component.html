@@ -5,7 +5,7 @@
       <a routerLink="/home" routerLinkActive="active">Inicio</a>
       <a *ngIf="!isLoggedIn" routerLink="/login" routerLinkActive="active">Iniciar sesión</a>
       <a *ngIf="!isLoggedIn" routerLink="/register" routerLinkActive="active">Registrar</a>
-      <a *ngIf="isLoggedIn && isAdmin" routerLink="/admin" class="nav-link">Panel Admin</a>
+      <!-- <a *ngIf="isLoggedIn && isAdmin" routerLink="/admin" class="nav-link">Panel Admin</a> -->
       <a *ngIf="isLoggedIn && isAdmin" routerLink="/usuarios" class="nav-link">Usuarios</a>
       <a *ngIf="isLoggedIn" routerLink="/mi-perfil" class="nav-link">Mi Perfil</a>
       <a *ngIf="isLoggedIn && isAdmin" routerLink="/turnos-admin" routerLinkActive="active">Turnos Clínica</a>

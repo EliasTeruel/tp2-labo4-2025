@@ -1,7 +1,7 @@
 <div class="register-container" *ngIf="usuario">
   <div class="register-form">
     <div class="perfil-header">
-      <img [src]="usuario.url_imagen" alt="Avatar" class="perfil-avatar" *ngIf="usuario.url_imagen">
+      <img [src]="usuario.url_imagen" alt="Avatar" class="perfil-avatar" *ngIf="usuario.url_imagen" appAvatarError>
       <div class="perfil-info">
       <h2>{{ usuario.nombre }} {{ usuario.apellido }}</h2>
       <p><b>Email:</b> {{ usuario.email }}</p>
@@ -21,6 +21,9 @@
   </div>
 </div>
 </div>
+
+
+
 
 <div class="register-container" *ngIf="usuario && usuario.rol === 'Especialista' && especialidadSeleccionada">
   <div class="register-form">
@@ -66,6 +69,11 @@
 <div class="register-container" *ngIf="usuario && usuario.rol === 'Paciente'">
   <div class="register-form">
     <h3>Historia Clínica</h3>
+    <button *ngIf=" especialidadSeleccionada" 
+        class="btn btn-register" 
+        (click)="generarPDFHistoriaClinica()">
+  Descargar Historia Clínica PDF por Especialidad
+</button>
     <div *ngIf="historiaClinica.length === 0">
       <p>No hay atenciones registradas.</p>
     </div>

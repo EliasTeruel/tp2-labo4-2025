@@ -170,7 +170,7 @@ async getQuickLoginUsers() {
   ];
   const { data, error } = await this.supabase
     .from('usuarios')
-    .select('email, rol, url_imagen')
+    .select('email, rol, nombre, url_imagen')
     .in('email', emails);
   if (error) throw error;
   return data;
@@ -213,20 +213,44 @@ async getEspecialidadesDeEspecialista(especialistaId: string) {
   return data.map((item: any) => item.especialidades);
 }
 
+// async getEspecialistasPorEspecialidad(especialidadId: string) {
+//   const { data, error } = await this.supabase
+//     .from('usuario_especialidad')
+//     .select('usuario_id, usuarios(nombre, apellido)')
+//     .eq('especialidad_id', especialidadId);
+
+//   if (error) throw error;
+//   if (error) throw error;
+//   return data.map((item: any) => ({
+//     id: item.usuario_id,
+//     nombre: item.usuarios.nombre,
+//     apellido: item.usuarios.apellido
+//   }));
+// }
 async getEspecialistasPorEspecialidad(especialidadId: string) {
   const { data, error } = await this.supabase
     .from('usuario_especialidad')
-    .select('usuario_id, usuarios(nombre, apellido)')
+    .select(`
+      usuario_id,
+      usuarios (
+        id,
+        nombre,
+        apellido,
+        url_imagen
+      )
+    `)
     .eq('especialidad_id', especialidadId);
 
   if (error) throw error;
-  if (error) throw error;
+
   return data.map((item: any) => ({
     id: item.usuario_id,
     nombre: item.usuarios.nombre,
-    apellido: item.usuarios.apellido
+    apellido: item.usuarios.apellido,
+    url_imagen: item.usuarios.url_imagen
   }));
 }
+
 
 async getTurnosPorEspecialistaYFecha(especialistaId: string, fechaInicio: string, fechaFin: string) {
   const { data, error } = await this.supabase
@@ -347,7 +371,8 @@ async getTurnosClinica() {
     .select(`
       *,
       especialidades(id, nombre),
-      usuarios:especialista_id(id, nombre, apellido)
+      usuarios:especialista_id(id, nombre, apellido),
+      pacientes:paciente_id(nombre, apellido)
     `)
     .order('fecha', { ascending: true });
   if (error) throw error;
@@ -487,14 +512,14 @@ async getHistoriaClinicaPorTurno(turnoId: string) {
 }
 
 
-async getTodasLasHistoriasClinicas() {
-  const { data, error } = await this.supabase
-    .from('historia_clinica')
-    .select('*')
-    .order('fecha_atencion', { ascending: false });
-  if (error) throw error;
-  return data;
-}
+// async getTodasLasHistoriasClinicas() {
+//   const { data, error } = await this.supabase
+//     .from('historia_clinica')
+//     .select('*')
+//     .order('fecha_atencion', { ascending: false });
+//   if (error) throw error;
+//   return data;
+// }
 
 async getTurnosPorEspecialidad() {
   const { data, error } = await this.supabase
@@ -568,6 +593,108 @@ const conteo: { [medico: string]: number } = {};
 
   return resultado;
 }
+
+
+async getPacientes() {
+  const { data, error } = await this.supabase
+    .from('usuarios')
+    .select('id, nombre, apellido')
+    .eq('rol', 'Paciente');
+
+  if (error) {
+    throw error;
+  }
+  return data;
+}
+
+
+async getUltimosTurnosPorPaciente(pacienteId: string, especialistaId: string) {
+  const { data, error } = await this.supabase
+    .from('turnos')
+    .select('fecha')
+    .eq('paciente_id', pacienteId)
+    .eq('especialista_id', especialistaId)
+    .eq('estado', 'realizado') 
+    .order('fecha', { ascending: false })
+    .limit(3);
+
+  if (error) throw error;
+  return data;
+}
+
+
+
+async getUsuariosConRelaciones() {
+  const { data, error } = await this.supabase
+    .from('usuarios')
+.select(`
+  id,
+  nombre,
+  apellido,
+  email,
+  edad,
+  dni,
+  rol,
+  validado,
+  verificado,
+  url_imagen,
+  obras_sociales(nombre),
+  usuario_especialidad (
+    especialidades (nombre)
+  )
+    `);
+  if (error) throw error;
+  return data;
+}
+
+
+
+async getHistoriaYTurnosUsuario(usuarioId: string) {
+  const [historia, turnosPaciente, turnosEspecialista] = await Promise.all([
+    this.supabase.from('historia_clinica').select('*').eq('paciente_id', usuarioId),
+    this.supabase.from('turnos').select('*').eq('paciente_id', usuarioId),
+    this.supabase.from('turnos').select('*').eq('especialista_id', usuarioId)
+  ]);
+
+  return {
+    historia: historia.data || [],
+    turnosPaciente: turnosPaciente.data || [],
+    turnosEspecialista: turnosEspecialista.data || []
+  };
+}
+
+async getTodasLasHistoriasClinicas() {
+  const { data, error } = await this.supabase
+    .from('historia_clinica')
+    .select(`
+     *,
+      pacientes:paciente_id(nombre, apellido),
+      especialistas:especialista_id(nombre, apellido)
+    `)
+    .order('fecha_atencion', { ascending: false });
+
+  if (error) throw error;
+  return data;
+}
+
+
+async getTurnosPorPaciente(pacienteId: string) {
+  const { data, error } = await this.supabase
+    .from('turnos')
+    .select(`
+      fecha,
+      hora,
+      estado,
+      especialidades(nombre),
+      especialistas:especialista_id(nombre, apellido)
+    `)
+    .eq('paciente_id', pacienteId);
+
+  if (error) throw error;
+  return data;
+}
+
+
 
 
 

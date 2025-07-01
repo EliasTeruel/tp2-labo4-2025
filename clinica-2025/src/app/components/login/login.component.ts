@@ -8,6 +8,7 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
 import { Subscription } from 'rxjs';
 import { SupabaseService } from '../../services/supabase.service';
+import { trigger, transition, style, animate } from '@angular/animations';
 
 const supabase = createClient(environment.apiUrl, environment.publicAnonKey);
 
@@ -16,7 +17,15 @@ const supabase = createClient(environment.apiUrl, environment.publicAnonKey);
   imports: [ReactiveFormsModule, CommonModule, FormsModule],
   selector: 'app-login',
   templateUrl: './login.component.html',
-  styleUrl: './login.component.scss'
+  styleUrl: './login.component.scss',
+  animations: [
+    trigger('slideInFromBottom', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(80px)' }),
+        animate('800ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
+      ])
+    ])
+  ]
 })
 export class LoginComponent implements OnInit {
   loginForm: FormGroup;

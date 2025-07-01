@@ -10,21 +10,21 @@ body {
   overflow-x: hidden;
 }
 
-// body::before {
-//   content: "";
-//   position: fixed;
-//   top: 0;
-//   left: 0;
-//   width: 100%;
-//   height: 100%;
-//   background: url('/home2.jpg') no-repeat center center fixed;
-//   background-size: cover;
-//   z-index: -1;
-//    pointer-events: none;  
-//    background-position: center 10%;
-//    transform: scaleY(0.999); /* Achica verticalmente */
-//   transform-origin: top;
-// }
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url('/home2.jpg') no-repeat center center fixed;
+  background-size: cover;
+  z-index: -1;
+   pointer-events: none;  
+   background-position: center 10%;
+   transform: scaleY(0.999);
+  transform-origin: top;
+}
 
 
 
@@ -35,7 +35,6 @@ body {
 
 
 
-/* Estilos para el CAPTCHA */
 .captcha-modal {
   position: fixed;
   top: 0;
@@ -150,47 +149,45 @@ body {
 }
 
 
-/* Asegura que el contenedor que anima ocupe toda el área visible */
-.route-wrapper {
-  position: relative;
-  overflow: hidden;
-  min-height: 100vh;
-}
 
-/* Los componentes deben ocupar el espacio animado */
-router-outlet ~ * {
-  display: block;
-  min-height: 100vh;
-  width: 100%;
-}
+// .route-wrapper {
+//   position: relative;
+//   overflow: hidden;
+//   min-height: 100vh;
+// }
 
-.route-wrapper-animada {
-  position: relative;
-  min-height: 100vh;
-  overflow: hidden;
-  display: block;
-}
+// router-outlet ~ * {
+//   display: block;
+//   min-height: 100vh;
+//   width: 100%;
+// }
+
+// .route-wrapper-animada {
+//   position: relative;
+//   min-height: 100vh;
+//   overflow: hidden;
+//   display: block;
+// }
 
 
-route-wrapper-animada > * {
-  opacity: 0;
-}
-.route-wrapper {
-  position: relative;
-  min-height: 100vh;
-  width: 100%;
-}
+// route-wrapper-animada > * {
+//   opacity: 0;
+// }
+// .route-wrapper {
+//   position: relative;
+//   min-height: 100vh;
+//   width: 100%;
+// }
 
-.route-wrapper > * {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  width: 100%;
-  height: 100%;
-}
-
+// .route-wrapper > * {
+//   position: absolute;
+//   top: 0;
+//   left: 0;
+//   right: 0;
+//   bottom: 0;
+//   width: 100%;
+//   height: 100%;
+// }
 
 
 
@@ -198,15 +195,16 @@ route-wrapper-animada > * {
 
 
 
-.route-container {
-  position: relative;
-  min-height: 100vh;
-}
 
-.route-container > * {
-  display: block;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-}
+// .route-container {
+//   position: relative;
+//   min-height: 100vh;
+// }
+
+// .route-container > * {
+//   display: block;
+//   position: absolute;
+//   top: 0;
+//   left: 0;
+//   right: 0;
+// }

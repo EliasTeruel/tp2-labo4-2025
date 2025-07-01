@@ -21,34 +21,34 @@ export class AdminPanelComponent implements OnInit {
   especialistas: any[] = [];
   isLoading = false;
   errorMsg = '';
-usuarios: any[] = [];
-turnosPorEspecialidad: any[] = [];
+  usuarios: any[] = [];
+  turnosPorEspecialidad: any[] = [];
   barChartData: ChartConfiguration<'bar'>['data'] = {
     labels: [],
     datasets: [{ data: [], label: 'Turnos por especialidad' }]
   };
   barChartType: ChartType = 'bar';
   logIngresos: any[] = [];
-turnosPorDia: any[] = [];
-lineChartData: ChartConfiguration<'line'>['data'] = {
-  labels: [],
-  datasets: [{ data: [], label: 'Turnos por día' }]
-};
+  turnosPorDia: any[] = [];
+  lineChartData: ChartConfiguration<'line'>['data'] = {
+    labels: [],
+    datasets: [{ data: [], label: 'Turnos por día' }]
+  };
 
-turnosPorMedico: any[] = [];
-fechaDesde = '2025-06-01';
-fechaHasta = '2025-06-30';
-barMedicoChartData: ChartConfiguration<'bar'>['data'] = {
-  labels: [],
-  datasets: [{ data: [], label: 'Turnos' }]
-};
-informeSeleccionado: string = 'seleccionar';
-mostrarInformes: boolean = true;
-
-
+  turnosPorMedico: any[] = [];
+  fechaDesde = '2025-06-01';
+  fechaHasta = '2025-06-30';
+  barMedicoChartData: ChartConfiguration<'bar'>['data'] = {
+    labels: [],
+    datasets: [{ data: [], label: 'Turnos' }]
+  };
+  informeSeleccionado: string = 'seleccionar';
+  mostrarInformes: boolean = true;
 
 
-  constructor(private supabaseService: SupabaseService,private router: Router,) {}
+
+
+  constructor(private supabaseService: SupabaseService, private router: Router,) { }
 
   async ngOnInit() {
     await this.loadEspecialistas();
@@ -59,90 +59,89 @@ mostrarInformes: boolean = true;
   }
 
 
-ocultarInformes() {
-  this.mostrarInformes = false;
-  this.informeSeleccionado = 'seleccionar';
-  this.mostrarInformes = true;
-}
+  ocultarInformes() {
+    this.mostrarInformes = false;
+    this.informeSeleccionado = 'seleccionar';
+    this.mostrarInformes = true;
+  }
 
 
-async cargarTurnosPorMedico(estado: string) {
-  this.turnosPorMedico = await this.supabaseService.getTurnosPorMedicoYEstado(this.fechaDesde, this.fechaHasta, estado);
-  // Reasigna el objeto para forzar el refresco del gráfico
-  this.barMedicoChartData = {
-    labels: this.turnosPorMedico.map(e => e.medico),
-    datasets: [{ data: this.turnosPorMedico.map(e => e.cantidad), label: 'Turnos' }]
-  };
-  
-}
+  async cargarTurnosPorMedico(estado: string) {
+    this.turnosPorMedico = await this.supabaseService.getTurnosPorMedicoYEstado(this.fechaDesde, this.fechaHasta, estado);
+    this.barMedicoChartData = {
+      labels: this.turnosPorMedico.map(e => e.medico),
+      datasets: [{ data: this.turnosPorMedico.map(e => e.cantidad), label: 'Turnos' }]
+    };
 
-exportarTurnosPorMedicoExcel() {
-  const ws = XLSX.utils.json_to_sheet(this.turnosPorMedico);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'TurnosPorMedico');
-  XLSX.writeFile(wb, 'turnos-por-medico.xlsx');
-}
+  }
 
-exportarTurnosPorMedicoPDF() {
-  const doc = new jsPDF();
-  autoTable(doc, {
-    head: [['Médico', 'Cantidad']],
-    body: this.turnosPorMedico.map(e => [e.medico, e.cantidad])
-  });
-  doc.save('turnos-por-medico.pdf');
-}
+  exportarTurnosPorMedicoExcel() {
+    const ws = XLSX.utils.json_to_sheet(this.turnosPorMedico);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'TurnosPorMedico');
+    XLSX.writeFile(wb, 'turnos-por-medico.xlsx');
+  }
 
-async cargarTurnosPorDia() {
-  this.turnosPorDia = await this.supabaseService.getTurnosPorDia();
-  this.lineChartData.labels = this.turnosPorDia.map(e => e.fecha);
-  this.lineChartData.datasets[0].data = this.turnosPorDia.map(e => e.cantidad);
-  
+  exportarTurnosPorMedicoPDF() {
+    const doc = new jsPDF();
+    autoTable(doc, {
+      head: [['Médico', 'Cantidad']],
+      body: this.turnosPorMedico.map(e => [e.medico, e.cantidad])
+    });
+    doc.save('turnos-por-medico.pdf');
+  }
 
-}
+  async cargarTurnosPorDia() {
+    this.turnosPorDia = await this.supabaseService.getTurnosPorDia();
+    this.lineChartData.labels = this.turnosPorDia.map(e => e.fecha);
+    this.lineChartData.datasets[0].data = this.turnosPorDia.map(e => e.cantidad);
 
-exportarTurnosPorDiaExcel() {
-  const ws = XLSX.utils.json_to_sheet(this.turnosPorDia);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'TurnosPorDia');
-  XLSX.writeFile(wb, 'turnos-por-dia.xlsx');
-}
 
-exportarTurnosPorDiaPDF() {
-  const doc = new jsPDF();
-  autoTable(doc, {
-    head: [['Fecha', 'Cantidad']],
-    body: this.turnosPorDia.map(e => [e.fecha, e.cantidad])
-  });
-  doc.save('turnos-por-dia.pdf');
-}
-async cargarLogIngresos() {
-  this.logIngresos = await this.supabaseService.getLogIngresos();
-  
+  }
 
-}
+  exportarTurnosPorDiaExcel() {
+    const ws = XLSX.utils.json_to_sheet(this.turnosPorDia);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'TurnosPorDia');
+    XLSX.writeFile(wb, 'turnos-por-dia.xlsx');
+  }
 
-exportarLogIngresosExcel() {
-  const ws = XLSX.utils.json_to_sheet(this.logIngresos);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'LogIngresos');
-  XLSX.writeFile(wb, 'log-ingresos.xlsx');
-}
+  exportarTurnosPorDiaPDF() {
+    const doc = new jsPDF();
+    autoTable(doc, {
+      head: [['Fecha', 'Cantidad']],
+      body: this.turnosPorDia.map(e => [e.fecha, e.cantidad])
+    });
+    doc.save('turnos-por-dia.pdf');
+  }
+  async cargarLogIngresos() {
+    this.logIngresos = await this.supabaseService.getLogIngresos();
 
-exportarLogIngresosPDF() {
-  const doc = new jsPDF();
-  autoTable(doc, {
-    head: [['Usuario', 'Fecha y Hora']],
-    body: this.logIngresos.map(l => [l.usuario_email, l.fecha_hora])
-  });
-  doc.save('log-ingresos.pdf');
-}
+
+  }
+
+  exportarLogIngresosExcel() {
+    const ws = XLSX.utils.json_to_sheet(this.logIngresos);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'LogIngresos');
+    XLSX.writeFile(wb, 'log-ingresos.xlsx');
+  }
+
+  exportarLogIngresosPDF() {
+    const doc = new jsPDF();
+    autoTable(doc, {
+      head: [['Usuario', 'Fecha y Hora']],
+      body: this.logIngresos.map(l => [l.usuario_email, l.fecha_hora])
+    });
+    doc.save('log-ingresos.pdf');
+  }
 
 
   async cargarTurnosPorEspecialidad() {
     this.turnosPorEspecialidad = await this.supabaseService.getTurnosPorEspecialidad();
     this.barChartData.labels = this.turnosPorEspecialidad.map(e => e.especialidad);
     this.barChartData.datasets[0].data = this.turnosPorEspecialidad.map(e => e.cantidad);
-  
+
 
   }
 
@@ -161,29 +160,29 @@ exportarLogIngresosPDF() {
     });
     doc.save('turnos-por-especialidad.pdf');
   }
-async loadUsuarios() {
-  try {
-    this.usuarios = await this.supabaseService.getUsuarios(); 
-  } catch (e) {
-    this.errorMsg = 'Error al cargar usuarios';
+  async loadUsuarios() {
+    try {
+      this.usuarios = await this.supabaseService.getUsuarios();
+    } catch (e) {
+      this.errorMsg = 'Error al cargar usuarios';
+    }
   }
-}
   async loadEspecialistas() {
     this.isLoading = true;
     this.errorMsg = '';
     try {
       this.especialistas = await this.supabaseService.getEspecialistas();
-    console.log('Toggling validado for:', this.especialistas );
-this.especialistas = this.especialistas.map(esp => ({
-  ...esp,
-  verificado: !!esp.verificado,
-}));
-console.table(this.especialistas.map(e => ({
-  nombre: e.nombre,
-  apellido: e.apellido,
-  verificado: e.verificado,
-  tipo: typeof e.verificado
-})));
+      console.log('Toggling validado for:', this.especialistas);
+      this.especialistas = this.especialistas.map(esp => ({
+        ...esp,
+        verificado: !!esp.verificado,
+      }));
+      console.table(this.especialistas.map(e => ({
+        nombre: e.nombre,
+        apellido: e.apellido,
+        verificado: e.verificado,
+        tipo: typeof e.verificado
+      })));
     } catch (e) {
       this.errorMsg = 'Error al cargar especialistas';
     } finally {
@@ -203,11 +202,11 @@ console.table(this.especialistas.map(e => ({
   }
 
 
-registrarUsuario(rol: string) {
-  this.router.navigate(['/register'], { queryParams: { rol } });
-}
+  registrarUsuario(rol: string) {
+    this.router.navigate(['/register'], { queryParams: { rol } });
+  }
 
-descargarExcelUsuarios() {
+  descargarExcelUsuarios() {
     const datos = this.usuarios.map(u => ({
       Nombre: u.nombre,
       Apellido: u.apellido,

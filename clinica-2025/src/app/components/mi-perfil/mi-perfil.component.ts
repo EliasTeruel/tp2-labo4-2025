@@ -3,11 +3,14 @@ import { SupabaseService } from '../../services/supabase.service';
 import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import { AvatarErrorDirective } from '../../directives/avatar-error.directive';
 
 @Component({
   selector: 'app-mi-perfil',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, AvatarErrorDirective,],
   templateUrl: './mi-perfil.component.html',
   styleUrl: './mi-perfil.component.scss'
 })
@@ -90,6 +93,74 @@ getHorariosParaDia(i: number): string[] {
   return horarios;
 }
 
+generarPDFHistoriaClinica() {
+  if (!this.especialidadSeleccionada) {
+    alert('Seleccioná una especialidad para filtrar la historia clínica.');
+    return;
+  }
+
+  const atencionesFiltradas = this.historiaClinica.filter(atencion => 
+    atencion.especialidad_id === this.especialidadSeleccionada.id
+  );
+
+  if (atencionesFiltradas.length === 0) {
+    alert('No hay atenciones para la especialidad seleccionada.');
+    return;
+  }
+
+  const doc = new jsPDF();
+
+
+  const logoUrl = '/favicon.ico'; 
+  const img = new Image();
+  img.src = logoUrl;
+  img.onload = () => {
+    doc.addImage(img, 'ico', 10, 10, 50, 20);
+
+    doc.setFontSize(18);
+    doc.text('Informe de Historia Clínica', 70, 20);
+
+    const fechaHoy = new Date().toLocaleDateString();
+    doc.setFontSize(11);
+    doc.text(`Fecha de emisión: ${fechaHoy}`, 70, 28);
+
+    const startY = 40;
+
+    const columnas = [
+      { header: 'Fecha', dataKey: 'fecha' },
+      { header: 'Altura (cm)', dataKey: 'altura' },
+      { header: 'Peso (kg)', dataKey: 'peso' },
+      { header: 'Temperatura (°C)', dataKey: 'temperatura' },
+      { header: 'Presión', dataKey: 'presion' },
+      { header: 'Datos adicionales', dataKey: 'datos_dinamicos' },
+    ];
+
+    const filas = atencionesFiltradas.map(a => ({
+      fecha: new Date(a.fecha_atencion).toLocaleDateString(),
+      altura: a.altura,
+      peso: a.peso,
+      temperatura: a.temperatura,
+      presion: a.presion,
+      datos_dinamicos: a.datos_dinamicos ? 
+        Object.entries(a.datos_dinamicos).map(([k,v]) => `${k}: ${v}`).join(', ') : ''
+    }));
+
+    autoTable(doc, {
+      startY,
+      columns: columnas,
+      body: filas,
+      styles: { fontSize: 8 },
+      headStyles: { fillColor: [25, 118, 210] },
+      margin: { left: 10, right: 10 },
+    });
+
+    doc.save(`Historia_Clinica_${this.usuario.nombre}_${this.especialidadSeleccionada.nombre}.pdf`);
+  };
+
+  img.onerror = () => {
+    alert('Error al cargar el logo para el PDF.');
+  };
+}
 
 
 }

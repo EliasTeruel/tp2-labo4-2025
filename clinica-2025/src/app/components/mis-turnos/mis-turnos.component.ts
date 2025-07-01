@@ -1,6 +1,5 @@
-// mis-turnos.component.ts
 import { Component, OnInit } from '@angular/core';
-import { AuthService } from '../../services/auth.service'; // o como manejes el usuario
+import { AuthService } from '../../services/auth.service'; 
 import { SupabaseService } from '../../services/supabase.service';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -8,12 +7,13 @@ import { ResaltarPipe } from '../../pipes/resaltar.pipe';
 import { NombreCompletoPipe } from '../../pipes/nombre-completo.pipe';
 import { EstadoTurnoPipe } from '../../pipes/estado-turno.pipe';
 import { ResaltarRealizadoDirective } from '../../directives/resaltar-realizado.directive';
+import {  trigger,  transition,  style,  animate,  query,  stagger} from '@angular/animations';
 
 @Component({
   selector: 'app-mis-turnos',
   standalone: true,
-  imports: [ReactiveFormsModule, 
-    CommonModule, 
+  imports: [ReactiveFormsModule,
+    CommonModule,
     FormsModule,
     ResaltarPipe,
     NombreCompletoPipe,
@@ -21,7 +21,25 @@ import { ResaltarRealizadoDirective } from '../../directives/resaltar-realizado.
     ResaltarRealizadoDirective
   ],
   templateUrl: './mis-turnos.component.html',
-  styleUrls: ['./mis-turnos.component.scss']
+  styleUrls: ['./mis-turnos.component.scss'],
+  animations: [
+    trigger('zoomIn', [
+      transition(':enter', [
+        style({ transform: 'scale(0.8)', opacity: 0 }),
+        animate('800ms ease-out', style({ transform: 'scale(1)', opacity: 1 }))
+      ])
+    ]),
+    trigger('zoomList', [
+      transition('* => *', [
+        query(':enter', [
+          style({ transform: 'scale(0.8)', opacity: 0 }),
+          stagger('100ms', [
+            animate('800ms ease-out', style({ transform: 'scale(1)', opacity: 1 }))
+          ])
+        ], { optional: true })
+      ])
+    ])
+  ]
 })
 export class MisTurnosComponent implements OnInit {
   rol: string = '';
@@ -31,9 +49,9 @@ export class MisTurnosComponent implements OnInit {
   filtroEspecialidad: string | null = null;
   filtroUsuario: string | null = null;
   filtroUsuarios: any[] = [];
-objectKeys = Object.keys;
-historia = { altura: '', peso: '', temperatura: '', presion: '' };
-camposDinamicos: { clave: string, valor: string }[] = [];
+  objectKeys = Object.keys;
+  historia = { altura: '', peso: '', temperatura: '', presion: '' };
+  camposDinamicos: { clave: string, valor: string }[] = [];
   modalAbierto = false;
   modalVerResena = false;
   modalTitulo = '';
@@ -42,15 +60,15 @@ camposDinamicos: { clave: string, valor: string }[] = [];
   modalTipo: 'cancelar' | 'rechazar' | 'finalizar' | 'encuesta' | 'calificar' | null = null;
   modalTurno: any = null;
   modalResena = '';
-historiaClinica: any[] = [];
-busquedaGlobal: string = '';
-datosDinamicosForm = {
-  rango: 50,
-  numero: null,
-  apto: false
-};
-mensajeErrorHistoria: string = '';
-confirmando: boolean = false;
+  historiaClinica: any[] = [];
+  busquedaGlobal: string = '';
+  datosDinamicosForm = {
+    rango: 50,
+    numero: null,
+    apto: false
+  };
+  mensajeErrorHistoria: string = '';
+  confirmando: boolean = false;
 
   constructor(private authService: AuthService, private supabaseService: SupabaseService) { }
 
@@ -95,9 +113,9 @@ confirmando: boolean = false;
     this.turnosFiltrados = this.turnos;
 
     for (let turno of this.turnos) {
-  const historia = await this.supabaseService.getHistoriaClinicaPorTurno(turno.id);
-  turno.historia_clinica = historia?.[0] || null;
-}
+      const historia = await this.supabaseService.getHistoriaClinicaPorTurno(turno.id);
+      turno.historia_clinica = historia?.[0] || null;
+    }
 
   }
 
@@ -207,49 +225,49 @@ confirmando: boolean = false;
     this.modalTurno = null;
     this.modalTipo = null;
     this.modalResena = '';
-      this.mensajeErrorHistoria = '';
+    this.mensajeErrorHistoria = '';
   }
   async confirmarModal() {
     if (this.confirmando) return;
-  this.confirmando = true;
-  this.mensajeErrorHistoria = '';
+    this.confirmando = true;
+    this.mensajeErrorHistoria = '';
     this.mensajeErrorHistoria = '';
     if (!this.modalTurno) {
-    this.confirmando = false;
-    return;
-  }
+      this.confirmando = false;
+      return;
+    }
 
-  if (this.rol === 'Especialista' && this.modalTipo === 'finalizar') {
-    if (
-      !this.historia.altura ||
-      !this.historia.peso ||
-      !this.historia.temperatura ||
-      !this.historia.presion
-    ) {
-      this.mensajeErrorHistoria = 'Todos los campos de historia clínica son obligatorios.';
-      return;
-    }
-    if (
-      this.datosDinamicosForm.rango === null ||
-      this.datosDinamicosForm.rango === undefined ||
-      this.datosDinamicosForm.numero === null ||
-      this.datosDinamicosForm.numero === undefined ||
-      this.datosDinamicosForm.numero === ''
-    ) {
-      this.mensajeErrorHistoria = 'Debes completar todos los datos dinámicos.';
-      return;
-    }
-    for (let campo of this.camposDinamicos) {
-      if (!campo.clave || !campo.valor) {
-        this.mensajeErrorHistoria = 'Todos los campos dinámicos deben tener clave y valor.';
+    if (this.rol === 'Especialista' && this.modalTipo === 'finalizar') {
+      if (
+        !this.historia.altura ||
+        !this.historia.peso ||
+        !this.historia.temperatura ||
+        !this.historia.presion
+      ) {
+        this.mensajeErrorHistoria = 'Todos los campos de historia clínica son obligatorios.';
         return;
       }
+      if (
+        this.datosDinamicosForm.rango === null ||
+        this.datosDinamicosForm.rango === undefined ||
+        this.datosDinamicosForm.numero === null ||
+        this.datosDinamicosForm.numero === undefined ||
+        this.datosDinamicosForm.numero === ''
+      ) {
+        this.mensajeErrorHistoria = 'Debes completar todos los datos dinámicos.';
+        return;
+      }
+      for (let campo of this.camposDinamicos) {
+        if (!campo.clave || !campo.valor) {
+          this.mensajeErrorHistoria = 'Todos los campos dinámicos deben tener clave y valor.';
+          return;
+        }
+      }
+      await this.guardarHistoriaClinica();
+      this.confirmando = false;
+      this.cerrarModal();
+      return;
     }
-    await this.guardarHistoriaClinica();
-    this.confirmando = false;
-    this.cerrarModal();
-    return;
-  }
 
 
     if (this.modalTipo === 'cancelar' && this.modalComentario) {
@@ -272,81 +290,82 @@ confirmando: boolean = false;
   }
 
 
-async guardarHistoriaClinica() {
-  if (!this.modalTurno) return;
-  const datosDinamicos: any = {
-    'Rango': this.datosDinamicosForm.rango,
-    'Valor numérico': this.datosDinamicosForm.numero,
-    'Apto físico': this.datosDinamicosForm.apto ? 'Sí' : 'No'
-  };
-  // this.camposDinamicos.forEach(c => {
-  //   if (c.clave && c.valor) datosDinamicos[c.clave] = c.valor;
-  // });
+  async guardarHistoriaClinica() {
+    if (!this.modalTurno) return;
+    const datosDinamicos: any = {
+      'Rango': this.datosDinamicosForm.rango,
+      'Valor numérico': this.datosDinamicosForm.numero,
+      'Apto físico': this.datosDinamicosForm.apto ? 'Sí' : 'No'
+    };
+    this.camposDinamicos.forEach(c => {
+      if (c.clave && c.valor) datosDinamicos[c.clave] = c.valor;
+    });
 
-  await this.supabaseService.crearHistoriaClinica({
-    paciente_id: this.modalTurno.paciente_id,
-    especialista_id: this.modalTurno.especialista_id,
-    turno_id: this.modalTurno.id,
-    altura: this.historia.altura,
-    peso: this.historia.peso,
-    temperatura: this.historia.temperatura,
-    presion: this.historia.presion,
-    datos_dinamicos: datosDinamicos
-  });
+    await this.supabaseService.crearHistoriaClinica({
+      paciente_id: this.modalTurno.paciente_id,
+      especialista_id: this.modalTurno.especialista_id,
+      turno_id: this.modalTurno.id,
+      altura: this.historia.altura,
+      peso: this.historia.peso,
+      temperatura: this.historia.temperatura,
+      presion: this.historia.presion,
+      datos_dinamicos: datosDinamicos,
+      fecha_atencion: new Date().toISOString()
+    });
 
-  await this.supabaseService.finalizarTurno(this.modalTurno.id, 'Atención finalizada');
-  this.historia = { altura: '', peso: '', temperatura: '', presion: '' };
-  this.datosDinamicosForm = { rango: 50, numero: null, apto: false };
-  await this.recargarTurnos();
-}
-
-agregarCampoDinamico() {
-  if (this.camposDinamicos.length < 3) {
-    this.camposDinamicos.push({ clave: '', valor: '' });
+    await this.supabaseService.finalizarTurno(this.modalTurno.id, 'Atención finalizada');
+    this.historia = { altura: '', peso: '', temperatura: '', presion: '' };
+    this.datosDinamicosForm = { rango: 50, numero: null, apto: false };
+    await this.recargarTurnos();
   }
-}
 
-filtrarTurnos() {
-  const texto = this.busquedaGlobal.trim().toLowerCase();
-
-  this.turnosFiltrados = this.turnos.filter(t => {
-    const filtroEspecialidad = !this.filtroEspecialidad || t.especialidad_id === this.filtroEspecialidad;
-    const filtroUsuario = !this.filtroUsuario || (this.rol === 'Paciente' ? t.especialista_id === this.filtroUsuario : t.paciente_id === this.filtroUsuario);
-
-    if (!texto) return filtroEspecialidad && filtroUsuario;
-
-    let campos = [
-      t.fecha,
-      t.hora,
-      t.estado,
-      t.especialidades?.nombre,
-      t.usuarios?.nombre,
-      t.usuarios?.apellido,
-      t.usuarios?.email,
-      t.resena,
-      t.comentario,
-      t.calificacion?.toString()
-    ];
-
-    if (t.historia_clinica) {
-      campos.push(
-        t.historia_clinica.altura?.toString(),
-        t.historia_clinica.peso?.toString(),
-        t.historia_clinica.temperatura?.toString(),
-        t.historia_clinica.presion
-      );
-      if (t.historia_clinica.datos_dinamicos) {
-        Object.entries(t.historia_clinica.datos_dinamicos).forEach(([k, v]) => {
-          campos.push(k, v?.toString());
-        });
-      }
+  agregarCampoDinamico() {
+    if (this.camposDinamicos.length < 3) {
+      this.camposDinamicos.push({ clave: '', valor: '' });
     }
+  }
 
-    return filtroEspecialidad && filtroUsuario && campos.some(campo =>
-      campo && campo.toLowerCase().includes(texto)
-    );
-  });
-}
+  filtrarTurnos() {
+    const texto = this.busquedaGlobal.trim().toLowerCase();
+
+    this.turnosFiltrados = this.turnos.filter(t => {
+      const filtroEspecialidad = !this.filtroEspecialidad || t.especialidad_id === this.filtroEspecialidad;
+      const filtroUsuario = !this.filtroUsuario || (this.rol === 'Paciente' ? t.especialista_id === this.filtroUsuario : t.paciente_id === this.filtroUsuario);
+
+      if (!texto) return filtroEspecialidad && filtroUsuario;
+
+      let campos = [
+        t.fecha,
+        t.hora,
+        t.estado,
+        t.especialidades?.nombre,
+        t.usuarios?.nombre,
+        t.usuarios?.apellido,
+        t.usuarios?.email,
+        t.resena,
+        t.comentario,
+        t.calificacion?.toString()
+      ];
+
+      if (t.historia_clinica) {
+        campos.push(
+          t.historia_clinica.altura?.toString(),
+          t.historia_clinica.peso?.toString(),
+          t.historia_clinica.temperatura?.toString(),
+          t.historia_clinica.presion
+        );
+        if (t.historia_clinica.datos_dinamicos) {
+          Object.entries(t.historia_clinica.datos_dinamicos).forEach(([k, v]) => {
+            campos.push(k, v?.toString());
+          });
+        }
+      }
+
+      return filtroEspecialidad && filtroUsuario && campos.some(campo =>
+        campo && campo.toLowerCase().includes(texto)
+      );
+    });
+  }
 
 
 

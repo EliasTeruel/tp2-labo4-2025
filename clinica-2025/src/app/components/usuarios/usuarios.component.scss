@@ -42,3 +42,136 @@
   box-shadow: 0 1px 4px rgba(0,0,0,0.06);
   font-size: 15px;
 }
+
+.admin-panel-container {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  padding: 2.5rem;
+  max-width: 800px;
+  margin: 2rem auto;
+}
+
+.admin-title {
+  color: #b50707;
+  font-family: "Poppins", sans-serif;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 2rem;
+  font-size: 1.8rem;
+}
+
+.especialistas-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1.5rem;
+  th, td {
+    padding: 0.75rem;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+  }
+  th {
+    background: #f8f9fa;
+    color: #b50707;
+    font-weight: 600;
+  }
+}
+
+.especialista-img {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #b50707;
+}
+
+.btn-register {
+  background-color: #28a745;
+  color: white;
+  border-radius: 8px;
+  padding: 0.5rem 1.2rem;
+  font-family: "Poppins", sans-serif;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s;
+  &:hover {
+    background-color: darken(#28a745, 10%);
+  }
+}
+
+.text-success { color: #28a745; }
+.text-danger { color: #b50707; }
+
+
+
+
+
+
+
+.pacientes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 16px;
+  margin-top: 12px;
+}
+
+.paciente-card {
+  background: #fefefe;
+  border: 2px solid #dcdcdc;
+  border-radius: 12px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.06);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+
+  &:hover {
+    border-color: #28a745;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  cursor: pointer;
+
+  }
+
+  &.selected {
+    border-color: #1976d2;
+    background-color: #f0f8ff;
+  cursor: pointer;
+
+  }
+
+  .paciente-info {
+    margin-bottom: 12px;
+    font-size: 15px;
+
+    strong {
+      display: block;
+      color: #333;
+    }
+
+    small {
+      color: #777;
+      font-size: 13px;
+    }
+  }
+
+  .btn-descargar {
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    align-self: flex-start;
+
+    &:hover {
+      background-color: darken(#28a745, 10%);
+  cursor: pointer;
+
+    }
+  }
+}

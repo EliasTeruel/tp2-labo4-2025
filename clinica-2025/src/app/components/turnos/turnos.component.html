@@ -1,13 +1,158 @@
 <div class="register-container">
   <form class="register-form" (ngSubmit)="onSubmit()" *ngIf="especialidades">
+
+    <div *ngIf="especialidades.length > 0">
+      <label>Especialidades:</label>
+      <div class="especialidades-grid">
+        <div
+          *ngFor="let esp of especialidades"
+          class="especialidad-card"
+          (click)="seleccionarEspecialidad(esp)"
+          [class.seleccionado]="especialidadSeleccionada === esp.id"
+        >
+          <img [src]="'/' + obtenerImagenEspecialidad(esp.nombre)" alt="{{ esp.nombre }}" />
+          <span>{{ esp.nombre | capitalizar }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="especialistas.length > 0">
+      <label>Especialistas:</label>
+      <div class="profesionales-grid">
+        <div
+          *ngFor="let prof of especialistas"
+          class="profesional-card"
+          (click)="seleccionarEspecialista(prof)"
+          [class.seleccionado]="especialistaSeleccionado === prof.id"
+        >
+          <span>{{ prof.nombre | capitalizar }} {{ prof.apellido | capitalizar }}</span>
+          <img
+            [src]="prof.url_imagen || '/default.png'"
+            alt="{{ prof.nombre | capitalizar }}"
+            (error)="reemplazarConImagenLocal($event)"
+          />
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="rol === 'admin'" class="form-group">
+  <label>Seleccionar Paciente:</label>
+  <select [(ngModel)]="pacienteId" name="pacienteId" class="form-control">
+    <option value="" disabled selected>Seleccionar un paciente</option>
+    <option *ngFor="let paciente of pacientes" [value]="paciente.id">
+      {{ paciente.nombre | capitalizar }} {{ paciente.apellido | capitalizar }}
+    </option>
+  </select>
+</div>
+
+    <div class="form-group" *ngIf="especialistaSeleccionado">
+      <div *ngIf="loadingFechas" class="loading-container">
+        <span class="loading-spinner"></span> Cargando fechas disponibles...
+      </div>
+
+      <div class="botones-grid" *ngIf="!loadingFechas && fechasDisponibles.length > 0">
+        <label>Día:</label>
+        <button
+          type="button"
+          class="btn-dia"
+          *ngFor="let fecha of fechasDisponibles"
+          [class.seleccionado]="fechaSeleccionada === fecha"
+          (click)="seleccionarFecha(fecha)"
+        >
+          {{ fecha  | formatoFecha }}
+        </button>
+      </div>
+
+      <div *ngIf="!loadingFechas && fechasDisponibles.length === 0" class="alert alert-warning">
+        {{ msjNoFechas || 'No hay fechas disponibles' }}
+      </div>
+    </div>
+
+    <div class="form-group" *ngIf="fechaSeleccionada">
+      <div *ngIf="loadingHorarios" class="loading-container">
+        <span class="loading-spinner"></span> Cargando horarios disponibles...
+      </div>
+
+      <div class="botones-grid" *ngIf="!loadingHorarios && horariosDisponibles.length > 0">
+        <label>Horario:</label>
+        <button
+          type="button"
+          class="btn-hora"
+          *ngFor="let hora of horariosDisponibles"
+          [class.seleccionado]="horaSeleccionada === hora"
+          (click)="horaSeleccionada = hora"
+        >
+          {{ hora | formatoHora}}
+        </button>
+      </div>
+
+      <div *ngIf="!loadingHorarios && horariosDisponibles.length === 0" class="alert alert-warning">
+        {{ msjSinHorarios || 'No hay horarios disponibles' }}
+      </div>
+    </div>
+
+    <div class="d-grid gap-2">
+      <button type="submit" class="btn btn-register" [disabled]="isLoading || !horaSeleccionada">
+        <span *ngIf="isLoading" class="loading-spinner"></span>
+        {{ isLoading ? 'Procesando...' : 'Solicitar Turno' }}
+      </button>
+    </div>
+
+    <div *ngIf="msjError" class="alert alert-danger">{{ msjError }}</div>
+    <div *ngIf="msjExito" class="alert alert-success">{{ msjExito }}</div>
+  </form>
+</div>
+
+
+
+
+<!-- <div class="register-container">
+  <form class="register-form" (ngSubmit)="onSubmit()" *ngIf="especialidades">
+
+ -->
+
+
+<!-- 
     <div class="form-group">
       <label>Especialidad</label>
       <select [(ngModel)]="especialidadSeleccionada" name="especialidad" class="form-control my-2" required (change)="onEspecialidadChange()">
         <option value="" disabled selected>Seleccionar...</option>
         <option *ngFor="let esp of especialidades" [value]="esp.id">{{ esp.nombre }}</option>
       </select>
-    </div>
+    </div> -->
 
+
+<!-- 
+
+    <div class="profesionales-grid" *ngIf="especialistas.length > 0">
+  <div
+    *ngFor="let prof of especialistas"
+    class="profesional-card"
+    (click)="seleccionarEspecialista(prof)"
+    [class.seleccionado]="especialistaSeleccionado === prof.id"
+  >
+    <span>{{ prof.nombre }} {{ prof.apellido }}</span>
+    <img
+      [src]="'/' + prof.imagen"
+      alt="{{ prof.nombre }}"
+      onerror="this.src='defaultesp.png'"
+    />
+  </div>
+</div> -->
+
+
+<!-- 
+<div *ngFor="let esp of especialistas">
+  <span>{{ esp.nombre }} {{ esp.apellido }}</span>
+  <img
+    [src]="esp.url_imagen || '/default.jpg'"
+    alt="Foto de {{ esp.nombre }}"
+    (error)="reemplazarConImagenLocal($event)"
+  />
+</div> -->
+
+
+<!-- 
     <div class="form-group">
       <div *ngIf="loadingEspecialistas" class="loading-container">
         <span class="loading-spinner"></span> Cargando especialistas...
@@ -27,7 +172,11 @@
       <div *ngIf="!loadingEspecialistas && especialistas.length === 0 && especialidadSeleccionada" class="alert alert-warning">
         {{ msjNoEspecialistas || 'No hay especialistas disponibles' }}
       </div>
-    </div>
+    </div> -->
+
+
+<!-- 
+
 
     <div class="form-group">
       <label>Día</label>
@@ -70,9 +219,9 @@
       <div *ngIf="!loadingHorarios && horariosDisponibles.length === 0 && fechaSeleccionada" class="alert alert-warning">
         {{ msjSinHorarios || 'No hay horarios disponibles' }}
       </div>
-    </div>
+    </div> -->
 
-    <div class="d-grid gap-2">
+    <!-- <div class="d-grid gap-2">
       <button type="submit" class="btn btn-register" [disabled]="isLoading || !horaSeleccionada">
         <span *ngIf="isLoading" class="loading-spinner"></span>
         {{ isLoading ? 'Procesando...' : 'Solicitar Turno' }}
@@ -82,4 +231,4 @@
     <div *ngIf="msjError" class="alert alert-danger">{{ msjError }}</div>
     <div *ngIf="msjExito" class="alert alert-success">{{ msjExito }}</div>
   </form>
-</div>
+</div> -->

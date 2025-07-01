@@ -1,7 +1,7 @@
 <div class="register-container">
   <div
     class="register-card"
-    *ngIf="!tipoSeleccionado && !bloquearSeleccionTipo"
+    *ngIf="!tipoSeleccionado && !bloquearSeleccionTipo"  [@fadeSlide]
   >
     <h2 class="register-title">¿Cómo deseas registrarte?</h2>
     <div class="register-type-btns">
@@ -30,7 +30,7 @@
     </div>
   </div>
 
-  <form *ngIf="tipoSeleccionado" class="register-form" (ngSubmit)="register()">
+  <form *ngIf="tipoSeleccionado" class="register-form" (ngSubmit)="register()"  [@fadeSlideForm]>
     <div class="form-group">
       <input
         [(ngModel)]="firstName"
